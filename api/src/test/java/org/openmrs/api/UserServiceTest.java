@@ -841,7 +841,7 @@ public class UserServiceTest extends BaseContextSensitiveTest {
 	/**
 	 * @see {@link UserService#purgeRole(Role)}
 	 */
-	@Test(expected = DeleteRolesWithChildrenException.class)
+	@Test(expected = CannotDeleteRoleWithChildrenException.class)
 	@Verifies(value = "should throw error when role has child roles", method = "purgeRole(Role)")
 	public void purgeRole_shouldThrowErrorWhenRoleHasChildRoles() throws Exception {
 		Set<Role> childRole = new HashSet<Role>();

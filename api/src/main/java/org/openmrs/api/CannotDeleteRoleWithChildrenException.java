@@ -14,25 +14,25 @@
 package org.openmrs.api;
 
 /**
- * This exception is thrown when a role with childs roles is purged (see TRUNK-4114)
+ * This exception is thrown when a role with child roles is purged (see TRUNK-4114)
  */
-public class DeleteRolesWithChildrenException extends APIException {
+public class CannotDeleteRoleWithChildrenException extends APIException {
 	
-	private static final long serialVersionUID = -2793076644464158082L;
+	private static final long serialVersionUID = 1L;
 	
 	/**
-	 * Generic constructor that gives a normal message about editing not being allowed to the user.
+	 * Generic constructor that gives a normal message about deleting role not allowed.
 	 */
-	public DeleteRolesWithChildrenException() {
+	public CannotDeleteRoleWithChildrenException() {
 		this("Cannot delete a role with child role(s)");
 	}
 	
 	/**
 	 * Convenience constructor to give the user a message other than normal default one
 	 * 
-	 * @param message the String to show to the user as to why the encounter types are locked
+	 * @param message the String to show to the user as to why the role can't be deleted
 	 */
-	public DeleteRolesWithChildrenException(String message) {
+	public CannotDeleteRoleWithChildrenException(String message) {
 		super(message);
 	}
 	
@@ -40,22 +40,20 @@ public class DeleteRolesWithChildrenException extends APIException {
 	 * Convenience constructor to give the user a message other than the normal one and to chain
 	 * this exception with a parent exception.
 	 * 
-	 * @param message the String to show to the user as to why the encounter types are locked
+	 * @param message the String to show to the user as to why the role can't be deleted
 	 * @param cause the parent exception
 	 */
-	public DeleteRolesWithChildrenException(String message, Throwable cause) {
+	public CannotDeleteRoleWithChildrenException(String message, Throwable cause) {
 		super(message, cause);
 	}
 	
 	/**
 	 * Convenience constructor used to only set the parent exception to chain with. This does not
-	 * set the error message for the user as to why an exception is being thrown. The
-	 * {@link #EncounterTypeLockedException(String, Throwable)} constructor is preferred over this
-	 * one.
+	 * set the error message for the user as to why an exception is being thrown.
 	 * 
 	 * @param cause the parent exception
 	 */
-	public DeleteRolesWithChildrenException(Throwable cause) {
+	public CannotDeleteRoleWithChildrenException(Throwable cause) {
 		super(cause);
 	}
 	

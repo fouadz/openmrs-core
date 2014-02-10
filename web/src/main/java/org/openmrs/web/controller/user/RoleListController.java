@@ -16,6 +16,7 @@ package org.openmrs.web.controller.user;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +27,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Role;
 import org.openmrs.api.APIException;
-import org.openmrs.api.DeleteRolesWithChildrenException;
+import org.openmrs.api.CannotDeleteRoleWithChildrenException;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.util.OpenmrsUtil;
@@ -42,6 +43,8 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.SimpleFormController;
 import org.springframework.web.servlet.view.RedirectView;
 
+import com.google.common.base.Joiner;
+
 public class RoleListController extends SimpleFormController {
 	
 	/** Logger for this class and subclasses */
@@ -50,7 +53,7 @@ public class RoleListController extends SimpleFormController {
 	/**
 	 * Allows for Integers to be used as values in input tags. Normally, only strings and lists are
 	 * expected
-	 *
+	 * 
 	 * @see org.springframework.web.servlet.mvc.BaseCommandController#initBinder(javax.servlet.http.HttpServletRequest,
 	 *      org.springframework.web.bind.ServletRequestDataBinder)
 	 */
@@ -62,7 +65,7 @@ public class RoleListController extends SimpleFormController {
 	/**
 	 * The onSubmit function receives the form/command object that was modified by the input form
 	 * and saves it to the db
-	 *
+	 * 
 	 * @see org.springframework.web.servlet.mvc.SimpleFormController#onSubmit(javax.servlet.http.HttpServletRequest,
 	 *      javax.servlet.http.HttpServletResponse, java.lang.Object,
 	 *      org.springframework.validation.BindException)
@@ -85,7 +88,7 @@ public class RoleListController extends SimpleFormController {
 				
 				String deleted = msa.getMessage("general.deleted");
 				String notDeleted = msa.getMessage("Role.cannot.delete");
-				String roleWithdChild = msa.getMessage("Role.purge.with.child");
+				String DeleteRoleWithdChildMsg = msa.getMessage("Role.cannot.delete.with.child");
 				for (String p : roleList) {
 					//TODO convenience method deleteRole(String) ??
 					try {
@@ -98,8 +101,12 @@ public class RoleListController extends SimpleFormController {
 					catch (DataIntegrityViolationException e) {
 						error = handleRoleIntegrityException(e, error, notDeleted);
 					}
-					catch (DeleteRolesWithChildrenException e) {
-						error = handleRoleIntegrityException(e, e.getMessage(), roleWithdChild);
+					catch (CannotDeleteRoleWithChildrenException e) {
+						log.error("Error deleting role", e);
+						
+						Set<Role> childRoleSet = us.getRole(p).getAllChildRoles();
+						String childRoles = Joiner.on(',').join(childRoleSet.iterator());
+						error = DeleteRoleWithdChildMsg + " : " + childRoles;
 					}
 					catch (APIException e) {
 						error = handleRoleIntegrityException(e, error, notDeleted);
@@ -125,7 +132,7 @@ public class RoleListController extends SimpleFormController {
 	/**
 	 * Logs a role delete data integrity violation exception and returns a user friendly message of
 	 * the problem that occurred.
-	 *
+	 * 
 	 * @param e the exception.
 	 * @param error the error message.
 	 * @param notDeleted the role not deleted error message.
@@ -133,15 +140,14 @@ public class RoleListController extends SimpleFormController {
 	 */
 	private String handleRoleIntegrityException(Exception e, String error, String notDeleted) {
 		log.warn("Error deleting role", e);
-		error = notDeleted + " " + error;
-
+		error += notDeleted;
 		return error;
 	}
 	
 	/**
 	 * This is called prior to displaying a form for the first time. It tells Spring the
 	 * form/command object to load into the request
-	 *
+	 * 
 	 * @see org.springframework.web.servlet.mvc.AbstractFormController#formBackingObject(javax.servlet.http.HttpServletRequest)
 	 */
 	protected Object formBackingObject(HttpServletRequest request) throws ServletException {

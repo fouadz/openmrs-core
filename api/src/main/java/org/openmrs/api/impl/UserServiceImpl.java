@@ -31,7 +31,7 @@ import org.openmrs.Role;
 import org.openmrs.User;
 import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.APIException;
-import org.openmrs.api.DeleteRolesWithChildrenException;
+import org.openmrs.api.CannotDeleteRoleWithChildrenException;
 import org.openmrs.api.UserService;
 import org.openmrs.api.context.Context;
 import org.openmrs.api.db.DAOException;
@@ -47,7 +47,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Default implementation of the user service. This class should not be used on its own. The current
  * OpenMRS implementation should be fetched from the Context
- *
+ * 
  * @see org.openmrs.api.UserService
  * @see org.openmrs.api.context.Context
  */
@@ -324,9 +324,9 @@ public class UserServiceImpl extends BaseOpenmrsService implements UserService {
 		}
 		
 		if (role.hasChildRoles()) {
-			throw new DeleteRolesWithChildrenException(role.getChildRoles().toString());
+			throw new CannotDeleteRoleWithChildrenException();
 		}
-
+		
 		dao.deleteRole(role);
 	}
 	
@@ -450,7 +450,7 @@ public class UserServiceImpl extends BaseOpenmrsService implements UserService {
 	
 	/**
 	 * Convenience method to check if the authenticated user has all privileges they are giving out
-	 *
+	 * 
 	 * @param new user that has privileges
 	 */
 	private void checkPrivileges(User user) {
@@ -533,7 +533,7 @@ public class UserServiceImpl extends BaseOpenmrsService implements UserService {
 	
 	/**
 	 * Generates system ids based on the following algorithm scheme: user_id-check digit
-	 *
+	 * 
 	 * @see org.openmrs.api.UserService#generateSystemId()
 	 */
 	@Transactional(readOnly = true)
@@ -585,7 +585,7 @@ public class UserServiceImpl extends BaseOpenmrsService implements UserService {
 	/**
 	 * Convenience method to check if the authenticated user has all privileges they are giving out
 	 * to the new role
-	 *
+	 * 
 	 * @param new user that has privileges
 	 */
 	private void checkPrivileges(Role role) {
